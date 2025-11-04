@@ -18,14 +18,29 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    """Renders the home page.
+
+    Returns:
+        flask.Response: The rendered index.html template.
+    """
     return render_template("index.html")
 
 @app.route('/about')
 def about():
+    """Renders the about page.
+
+    Returns:
+        flask.Response: The rendered about.html template.
+    """
     return render_template("about.html")
 
 @app.route('/viewdata', methods=["GET", "POST"])
 def viewdata():
+    """Reads and displays the dataset.
+
+    Returns:
+        flask.Response: The rendered viewdata.html template with the dataset.
+    """
     dataset = pd.read_csv('stress_detection_IT_professionals_dataset.csv')
     dataset.to_html()
     print(dataset)
@@ -35,6 +50,16 @@ def viewdata():
 
 @app.route('/preprocess', methods=['POST', 'GET'])
 def preprocess():
+    """Preprocesses the data and splits it into training and testing sets.
+
+    Handles both GET and POST requests. On POST, it reads the split size from
+    the form, loads the dataset, handles missing values, and splits the data
+    into training and testing sets.
+
+    Returns:
+        flask.Response: The rendered preprocess.html template, with a success
+        message on POST.
+    """
     global x, y, x_train, x_test, y_train, y_test, df
     if request.method == "POST":
         size = int(request.form['split'])
@@ -62,6 +87,17 @@ def preprocess():
 
 @app.route('/model', methods=["POST", "GET"])
 def model():
+    """Trains and evaluates machine learning models.
+
+    Handles both GET and POST requests. On POST, it gets the selected algorithm
+    from the form, trains the corresponding model (RandomForestRegressor,
+    AdaBoostRegressor, ExtraTreeRegressor, or CNN), evaluates its performance,
+    and saves the trained model.
+
+    Returns:
+        flask.Response: The rendered model.html template, with the model's
+        performance score on POST.
+    """
     if request.method == "POST":
         global x_train, x_test, y_train, y_test
         s = int(request.form['algo'])
@@ -145,6 +181,16 @@ def model():
 # Route for prediction and stress reduction suggestion
 @app.route('/prediction', methods=["POST", "GET"])
 def prediction():
+    """Predicts stress level and provides a suggestion.
+
+    Handles both GET and POST requests. On POST, it takes user input from the
+    form, uses a trained RandomForestRegressor model to predict the stress level,
+    and returns a suggestion based on the predicted level.
+
+    Returns:
+        flask.Response: The rendered prediction.html template, with the
+        prediction and suggestion on POST.
+    """
     if request.method == "POST":
         # Retrieve input values from the form
         f1 = request.form.get('Heart_Rate', type=float)
